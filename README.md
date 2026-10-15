@@ -1,5 +1,7 @@
 # 天机阁 · 四术问天
 
+> 🔮 在线访问：**https://silasriver.github.io/si-shu-wen-tian/**
+
 一个纯静态的中国传统术数体验站。四门入局：
 
 | 门 | 模块 | 内容 |
