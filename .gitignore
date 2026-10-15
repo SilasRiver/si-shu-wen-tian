@@ -1,0 +1,12 @@
+# 本地开发与工具产物（不上传）
+.workbuddy-ai/
+
+# 图片原图（站点实际使用 assets/images/*.webp，原图仅留本地存档）
+assets/images/source/
+
+# 系统与编辑器
+.DS_Store
+Thumbs.db
+desktop.ini
+*.log
+node_modules/

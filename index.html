@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>天机阁 · 四术问天</title>
+<meta name="description" content="天机阁 —— 梅花易数、八字命盘、MBTI 人格、今日运势。以数为骨，以象为魂。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;600;900&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body class="is-intro">
+
+<!-- ============ 背景层 ============ -->
+<div class="bg" aria-hidden="true">
+  <div class="bg__image"></div>
+  <canvas id="starfield"></canvas>
+  <div class="bg__scan"></div>
+  <div class="bg__grid"></div>
+  <div class="bg__vignette"></div>
+</div>
+
+<!-- ============ 开场动画 ============ -->
+<div class="intro" id="intro">
+  <div class="intro__stage">
+    <div class="intro__ring intro__ring--outer">
+      <svg viewBox="0 0 400 400" class="intro__svg">
+        <defs>
+          <linearGradient id="gGold" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#f3dda6"/>
+            <stop offset="55%" stop-color="#d9b46a"/>
+            <stop offset="100%" stop-color="#8a6b2f"/>
+          </linearGradient>
+        </defs>
+        <circle cx="200" cy="200" r="186" fill="none" stroke="url(#gGold)" stroke-width="0.8" stroke-dasharray="2 7" opacity=".75"/>
+        <circle cx="200" cy="200" r="170" fill="none" stroke="url(#gGold)" stroke-width="1.2" opacity=".9"/>
+        <g id="trigramRing" stroke="url(#gGold)" stroke-width="3.4" stroke-linecap="butt"></g>
+      </svg>
+    </div>
+
+    <div class="intro__ring intro__ring--mid">
+      <svg viewBox="0 0 400 400" class="intro__svg">
+        <circle cx="200" cy="200" r="140" fill="none" stroke="#5ec8c0" stroke-width="0.7" opacity=".55"/>
+        <g id="tickRing" stroke="#d9b46a" stroke-width="1.1" opacity=".85"></g>
+        <circle cx="200" cy="200" r="118" fill="none" stroke="#5ec8c0" stroke-width="0.6" stroke-dasharray="1 6" opacity=".5"/>
+      </svg>
+    </div>
+
+    <div class="intro__core">
+      <div class="intro__halo"></div>
+      <div class="intro__taiji">
+        <svg viewBox="0 0 200 200">
+          <circle cx="100" cy="100" r="72" fill="#070a14" stroke="#d9b46a" stroke-width="1.4"/>
+          <path d="M100 28 a36 36 0 0 1 0 72 a36 36 0 0 0 0 72 a72 72 0 0 1 0 -144 z" fill="#d9b46a"/>
+          <circle cx="100" cy="64" r="11" fill="#070a14"/>
+          <circle cx="100" cy="136" r="11" fill="#d9b46a"/>
+        </svg>
+      </div>
+      <div class="intro__pulse"></div>
+      <div class="intro__pulse" style="animation-delay:1.5s"></div>
+    </div>
+  </div>
+
+  <div class="intro__title">
+    <span class="intro__title-cn" id="introTitle">天机阁</span>
+    <span class="intro__title-en">T I A N J I &nbsp; O R A C L E</span>
+  </div>
+
+  <div class="intro__hud">
+    <div class="intro__status">
+      <span class="intro__status-label">推演天机</span>
+      <span class="intro__status-step" id="introStep">聚气</span>
+    </div>
+    <div class="intro__bar"><i id="introBar"></i></div>
+    <div class="intro__meta">
+      <span id="introPct">0%</span>
+      <span class="intro__skip" id="introSkip">点击任意处 · 直接入阁</span>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 主应用 ============ -->
+<main class="app" id="app">
+
+  <header class="topbar">
+    <a class="brand" href="#" data-home>
+      <span class="brand__mark">
+        <svg viewBox="0 0 40 40" aria-hidden="true">
+          <circle cx="20" cy="20" r="17" fill="none" stroke="currentColor" stroke-width="1.2"/>
+          <path d="M20 5a7.5 7.5 0 0 1 0 15a7.5 7.5 0 0 0 0 15a15 15 0 0 1 0-30z" fill="currentColor" opacity=".9"/>
+        </svg>
+      </span>
+      <span class="brand__text">
+        <b>天机阁</b>
+        <i>TIANJI ORACLE</i>
+      </span>
+    </a>
+
+    <div class="topbar__right">
+      <span class="topbar__date" id="todayLabel"></span>
+      <button class="icon-btn" id="soundBtn" type="button" aria-pressed="true" title="音效开关">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path class="ico-on" d="M4 9v6h4l5 4V5L8 9H4zm12.5 3a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4zM14 3.2v2.1a7 7 0 0 1 0 13.4v2.1a9 9 0 0 0 0-17.6z"/></svg>
+      </button>
+      <button class="icon-btn icon-btn--back" id="homeBtn" type="button" title="归位">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 3 10.5V21h6v-6h6v6h6V10.5L12 3z"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- ---------- 首页 · 三门 ---------- -->
+  <section class="view view--home is-active" id="view-home">
+    <div class="hero">
+      <p class="hero__eyebrow"><i></i>四 术 问 天<i></i></p>
+      <h1 class="hero__title">
+        <span class="hero__title-line" data-reveal>以数为骨</span>
+        <span class="hero__title-line hero__title-line--alt" data-reveal>以象为魂</span>
+      </h1>
+      <p class="hero__sub" data-reveal>
+        梅花观机、八字立命、人格识己、运势知时。<br>
+        择一门而入，天机自现。
+      </p>
+    </div>
+
+    <div class="gates" id="gates">
+      <button class="gate" type="button" data-goto="meihua" data-index="0">
+        <span class="gate__bg" style="background-image:url('assets/images/card-meihua.webp')"></span>
+        <span class="gate__scrim"></span>
+        <span class="gate__frame"></span>
+        <span class="gate__num">壹</span>
+        <span class="gate__body">
+          <span class="gate__tag">易学 · 起卦</span>
+          <span class="gate__title">梅花易数</span>
+          <span class="gate__desc">心动则卦成。以农历年月日时取数起卦，推本卦、互卦、变卦，参月建旺衰，断体用生克。</span>
+          <span class="gate__cta">起 卦 <i>→</i></span>
+        </span>
+        <span class="gate__glow"></span>
+      </button>
+
+      <button class="gate" type="button" data-goto="bazi" data-index="1">
+        <span class="gate__bg" style="background-image:url('assets/images/card-bazi.webp')"></span>
+        <span class="gate__scrim"></span>
+        <span class="gate__frame"></span>
+        <span class="gate__num">贰</span>
+        <span class="gate__body">
+          <span class="gate__tag">命理 · 一生</span>
+          <span class="gate__title">八字命盘</span>
+          <span class="gate__desc">以生辰立四柱，定日主强弱与喜用忌神，排大运九步、流年九十，观一生起伏之序。</span>
+          <span class="gate__cta">立 命 <i>→</i></span>
+        </span>
+        <span class="gate__glow"></span>
+      </button>
+
+      <button class="gate" type="button" data-goto="mbti" data-index="2">
+        <span class="gate__bg" style="background-image:url('assets/images/card-mbti.webp')"></span>
+        <span class="gate__scrim"></span>
+        <span class="gate__frame"></span>
+        <span class="gate__num">叁</span>
+        <span class="gate__body">
+          <span class="gate__tag">心理 · 测评</span>
+          <span class="gate__title">MBTI 人格</span>
+          <span class="gate__desc">四维八极，二十八问定其性。识己之所长，知己之所短，得十六型人格之全貌。</span>
+          <span class="gate__cta">测 试 <i>→</i></span>
+        </span>
+        <span class="gate__glow"></span>
+      </button>
+
+      <button class="gate" type="button" data-goto="fortune" data-index="3">
+        <span class="gate__bg" style="background-image:url('assets/images/card-fortune.webp')"></span>
+        <span class="gate__scrim"></span>
+        <span class="gate__frame"></span>
+        <span class="gate__num">肆</span>
+        <span class="gate__body">
+          <span class="gate__tag">生肖 · 日运</span>
+          <span class="gate__title">今日运势</span>
+          <span class="gate__desc">择生肖以问今日。综合、事业、财运、情感四维评分，附宜忌、幸运色与幸运数。</span>
+          <span class="gate__cta">问 运 <i>→</i></span>
+        </span>
+        <span class="gate__glow"></span>
+      </button>
+    </div>
+
+    <p class="hero__foot">仅作传统文化体验与娱乐，不构成任何决策建议</p>
+  </section>
+
+  <!-- ---------- 梅花易数 ---------- -->
+  <section class="view view--panel" id="view-meihua" data-module="meihua">
+    <div class="panel">
+      <div class="panel__head">
+        <p class="panel__kicker">壹 · 梅花易数</p>
+        <h2 class="panel__title">起 卦</h2>
+        <p class="panel__desc">以农历年支、月、日、时取数，是为梅花正法；亦可自报二数，或以出生时刻立本命卦。</p>
+      </div>
+      <div class="panel__body" id="meihuaBody"></div>
+    </div>
+  </section>
+
+  <!-- ---------- 八字命盘 ---------- -->
+  <section class="view view--panel" id="view-bazi" data-module="bazi">
+    <div class="panel panel--wide">
+      <div class="panel__head">
+        <p class="panel__kicker">贰 · 八字命盘</p>
+        <h2 class="panel__title">立 命</h2>
+        <p class="panel__desc">以出生年月日时立四柱，以节气定月建、立春换年。排大运、推流年，观一生之起伏。</p>
+      </div>
+      <div class="panel__body" id="baziBody"></div>
+    </div>
+  </section>
+
+  <!-- ---------- MBTI ---------- -->
+  <section class="view view--panel" id="view-mbti" data-module="mbti">
+    <div class="panel">
+      <div class="panel__head">
+        <p class="panel__kicker">叁 · MBTI 人格</p>
+        <h2 class="panel__title">问 心</h2>
+        <p class="panel__desc">凭第一直觉作答，无须斟酌。二十八问之后，见其本相。</p>
+      </div>
+      <div class="panel__body" id="mbtiBody"></div>
+    </div>
+  </section>
+
+  <!-- ---------- 今日运势 ---------- -->
+  <section class="view view--panel" id="view-fortune" data-module="fortune">
+    <div class="panel">
+      <div class="panel__head">
+        <p class="panel__kicker">肆 · 今日运势</p>
+        <h2 class="panel__title">问 运</h2>
+        <p class="panel__desc">择一生肖，观今日之势。日运随日而变，同一日同一生肖，结果唯一。</p>
+      </div>
+      <div class="panel__body" id="fortuneBody"></div>
+    </div>
+  </section>
+
+  <footer class="site-foot">
+    <span>天机阁 · TIANJI ORACLE</span>
+    <span>以数为骨 · 以象为魂</span>
+  </footer>
+</main>
+
+<!-- ============ 过场遮罩 ============ -->
+<div class="transition" id="transition" aria-hidden="true">
+  <div class="transition__ring"></div>
+  <div class="transition__flash"></div>
+</div>
+
+<!-- ============ 全局提示 ============ -->
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="js/data.js"></script>
+<!-- 农历换算数据源：solarlunar（MIT License） -->
+<script src="js/vendor/solarlunar.min.js"></script>
+<script src="js/lunar.js"></script>
+<script src="js/strokes.js"></script>
+<script src="js/split.js"></script>
+<script src="js/guaci.js"></script>
+<script src="js/meihua.js"></script>
+<script src="js/bazi.js"></script>
+<script src="js/bazi-ui.js"></script>
+<script src="js/mbti.js"></script>
+<script src="js/fortune.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
